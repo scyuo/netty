@@ -44,6 +44,10 @@
       <scope>compile</scope> <!-- override the 'test' scope defined at parent pom.xml -->
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.jctools</groupId>
+      <artifactId>jctools-core</artifactId>
+    </dependency>
 
     <!-- Logging frameworks - completely optional -->
     <dependency>
@@ -75,6 +79,31 @@
 
   <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.jctools</include>
+                </includes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.jctools.</pattern>
+                  <shadedPattern>io.netty.util.internal.shaded.org.jctools.</shadedPattern>
+                </relocation>
+              </relocations>
+              <minimizeJar>true</minimizeJar>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Add generated collection sources. -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
