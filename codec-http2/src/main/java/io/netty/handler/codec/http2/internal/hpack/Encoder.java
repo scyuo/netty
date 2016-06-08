@@ -328,7 +328,7 @@ public final class Encoder {
      */
     private int getIndex(int index) {
         if (index == -1) {
-            return index;
+            return -1;
         }
         return index - head.before.index + 1;
     }
@@ -400,7 +400,7 @@ public final class Encoder {
     private void clear() {
         Arrays.fill(headerFields, null);
         head.before = head.after = head;
-        this.size = 0;
+        size = 0;
     }
 
     /**

@@ -77,7 +77,6 @@ final class HuffmanEncoder {
                 encodeProcessor.out = out;
                 string.forEachByte(encodeProcessor);
                 encodeProcessor.end();
-
             } catch (Exception e) {
                 PlatformDependent.throwException(e);
             }
