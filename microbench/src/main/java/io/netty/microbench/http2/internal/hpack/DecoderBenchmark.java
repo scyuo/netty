@@ -45,6 +45,7 @@ import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.io.IOException;
@@ -67,11 +68,17 @@ public class DecoderBenchmark extends AbstractMicrobenchmark {
     @Param({ "true", "false" })
     public boolean limitToAscii;
 
-    private byte[] input;
+    private ByteBuf input;
 
     @Setup(Level.Trial)
     public void setup() throws IOException {
-        input = getSerializedHeaders(Util.headers(size, limitToAscii), sensitive);
+        input = Unpooled.wrappedBuffer(getSerializedHeaders(Util.headers(size, limitToAscii), sensitive));
+    }
+
+
+    @TearDown(Level.Trial)
+    public void teardown() throws IOException {
+        input.release();
     }
 
     @Benchmark
@@ -88,7 +95,7 @@ public class DecoderBenchmark extends AbstractMicrobenchmark {
                 return this;
             }
         };
-        decoder.decode(Unpooled.wrappedBuffer(input), headers);
+        decoder.decode(input.duplicate(), headers);
         decoder.endHeaderBlock();
     }
 

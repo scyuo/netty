@@ -33,7 +33,7 @@ package io.netty.handler.codec.http2.internal.hpack;
 
 import static io.netty.util.internal.ObjectUtil.checkNotNull;
 
-class HeaderField implements Comparable<HeaderField> {
+class HeaderField {
 
     // Section 4.1. Calculating Table Size
     // The additional 32 octets account for an estimated
@@ -61,32 +61,6 @@ class HeaderField implements Comparable<HeaderField> {
     public int hashCode() {
         // TODO(nmittler): Netty's build rules require this. Probably need a better implementation.
         return super.hashCode();
-    }
-
-    @Override
-    public int compareTo(HeaderField anotherHeaderField) {
-        int ret = compareTo(name, anotherHeaderField.name);
-        if (ret == 0) {
-            ret = compareTo(value, anotherHeaderField.value);
-        }
-        return ret;
-    }
-
-    private static int compareTo(CharSequence s1, CharSequence s2) {
-        int len1 = s1.length();
-        int len2 = s2.length();
-        int lim = Math.min(len1, len2);
-
-        int k = 0;
-        while (k < lim) {
-            byte b1 = (byte) s1.charAt(k);
-            byte b2 = (byte) s2.charAt(k);
-            if (b1 != b2) {
-                return b1 - b2;
-            }
-            k++;
-        }
-        return len1 - len2;
     }
 
     @Override
