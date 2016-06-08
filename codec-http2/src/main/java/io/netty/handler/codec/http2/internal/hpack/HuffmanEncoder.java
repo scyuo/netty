@@ -82,30 +82,33 @@ final class HuffmanEncoder {
                 PlatformDependent.throwException(e);
             }
         } else {
-            // slow path
-            long current = 0;
-            int n = 0;
+            encodeSlowPath(out, data);
+        }
+    }
 
-            for (int i = 0; i < data.length(); i++) {
-                int b = data.charAt(i) & 0xFF;
-                int code = codes[b];
-                int nbits = lengths[b];
+    private void encodeSlowPath(ByteBuf out, CharSequence data) {
+        long current = 0;
+        int n = 0;
 
-                current <<= nbits;
-                current |= code;
-                n += nbits;
+        for (int i = 0; i < data.length(); i++) {
+            int b = data.charAt(i) & 0xFF;
+            int code = codes[b];
+            int nbits = lengths[b];
 
-                while (n >= 8) {
-                    n -= 8;
-                    out.writeByte((int) (current >> n));
-                }
+            current <<= nbits;
+            current |= code;
+            n += nbits;
+
+            while (n >= 8) {
+                n -= 8;
+                out.writeByte((int) (current >> n));
             }
+        }
 
-            if (n > 0) {
-                current <<= 8 - n;
-                current |= 0xFF >>> n; // this should be EOS symbol
-                out.writeByte((int) current);
-            }
+        if (n > 0) {
+            current <<= 8 - n;
+            current |= 0xFF >>> n; // this should be EOS symbol
+            out.writeByte((int) current);
         }
     }
 
@@ -128,13 +131,16 @@ final class HuffmanEncoder {
                 encodedLengthProcessor.len = 0;
             }
         } else {
-            // slow path
-            long len = 0;
-            for (int i = 0; i < data.length(); i++) {
-                len += lengths[data.charAt(i) & 0xFF];
-            }
-            return (int) ((len + 7) >> 3);
+            return getEncodedLengthSlowPath(data);
         }
+    }
+
+    private int getEncodedLengthSlowPath(CharSequence data) {
+        long len = 0;
+        for (int i = 0; i < data.length(); i++) {
+            len += lengths[data.charAt(i) & 0xFF];
+        }
+        return (int) ((len + 7) >> 3);
     }
 
     private final class EncodeProcessor implements ByteProcessor {
@@ -159,7 +165,7 @@ final class HuffmanEncoder {
             return true;
         }
 
-        public void end() {
+        void end() {
             try {
                 if (n > 0) {
                     current <<= 8 - n;

@@ -145,7 +145,7 @@ final class HuffmanDecoder {
         private int currentBits;
         private int symbolBits;
 
-        public void reset() {
+        void reset() {
             node = ROOT;
             current = 0;
             currentBits = 0;
